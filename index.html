@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en" x-data="app()" x-init="init()" :class="{ 'dark': darkMode }" :data-theme="theme" :lang="lang">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpine E-Commerce</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+    <!-- TailwindCSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine.js via CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <style>
+        [x-cloak] { display: none !important; }
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        
+        /* CSS Variables for Theming */
+        :root, [data-theme="emerald"] {
+            --brand-50: #ecfdf5; --brand-100: #d1fae5; --brand-200: #a7f3d0;
+            --brand-300: #6ee7b7; --brand-400: #34d399; --brand-500: #10b981;
+            --brand-600: #059669; --brand-700: #047857; --brand-800: #065f46;
+            --brand-900: #064e3b; --brand-950: #022c22;
+        }
+        [data-theme="ocean"] {
+            --brand-50: #eff6ff; --brand-100: #dbeafe; --brand-200: #bfdbfe;
+            --brand-300: #93c5fd; --brand-400: #60a5fa; --brand-500: #3b82f6;
+            --brand-600: #2563eb; --brand-700: #1d4ed8; --brand-800: #1e40af;
+            --brand-900: #1e3a8a; --brand-950: #172554;
+        }
+        [data-theme="luxury"] {
+            --brand-50: #fffbeb; --brand-100: #fef3c7; --brand-200: #fde68a;
+            --brand-300: #fcd34d; --brand-400: #fbbf24; --brand-500: #f59e0b;
+            --brand-600: #d97706; --brand-700: #b45309; --brand-800: #92400e;
+            --brand-900: #78350f; --brand-950: #451a03;
+        }
+        [data-theme="retro"] {
+            --brand-50: #fef2f2; --brand-100: #fee2e2; --brand-200: #fecaca;
+            --brand-300: #fca5a5; --brand-400: #f87171; --brand-500: #ef4444;
+            --brand-600: #dc2626; --brand-700: #b91c1c; --brand-800: #991b1b;
+            --brand-900: #7f1d1d; --brand-950: #450a0a;
+        }
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+            background-repeat: no-repeat;
+            background-position-x: 100%;
+            background-position-y: 5px;
+            padding-right: 2rem;
+        }
+        .dark select {
+             background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 antialiased">
+<div x-cloak>
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-[var(--brand-600)] dark:text-[var(--brand-400)]">ShopCo</a>
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <!-- Currency Switcher -->
+                <div class="relative" x-show="config.currencies">
+                    <select x-model="currency" @change="setCurrency($event.target.value)" class="text-sm bg-gray-200 dark:bg-gray-700 border-none rounded-md py-1 pl-2 focus:ring-2 focus:ring-[var(--brand-500)]">
+                        <template x-for="(symbol, code) in config.currencies" :key="code">
+                            <option :value="code" x-text="code"></option>
+                        </template>
+                    </select>
+                </div>
+                 <!-- Language Switcher -->
+                <div class="relative" x-show="config.languages">
+                    <select x-model="lang" @change="setLanguage($event.target.value)" class="text-sm bg-gray-200 dark:bg-gray-700 border-none rounded-md py-1 pl-2 focus:ring-2 focus:ring-[var(--brand-500)]">
+                        <template x-for="(name, code) in config.languages" :key="code">
+                            <option :value="code" x-text="name"></option>
+                        </template>
+                    </select>
+                </div>
+                <!-- Theme Switcher -->
+                <div class="relative hidden md:block">
+                    <select x-model="theme" class="text-sm bg-gray-200 dark:bg-gray-700 border-none rounded-md py-1 pl-2 focus:ring-2 focus:ring-[var(--brand-500)]">
+                        <option value="emerald">Emerald</option>
+                        <option value="ocean">Ocean</option>
+                        <option value="luxury">Luxury</option>
+                        <option value="retro">Retro</option>
+                    </select>
+                </div>
+                <!-- Dark Mode Toggle -->
+                <button @click="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                    <span class="material-symbols-outlined" x-text="darkMode ? 'light_mode' : 'dark_mode'"></span>
+                </button>
+                <!-- Cart Icon -->
+                <button @click="modals.isCartOpen = true" class="relative p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                    <span class="material-symbols-outlined">shopping_cart</span>
+                    <span x-show="cart.length > 0" class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" x-text="cart.length"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <!-- Hero Section -->
+        <section class="relative h-64 md:h-96 rounded-lg overflow-hidden shadow-xl mb-12">
+            <template x-for="(slide, index) in heroSlides" :key="index">
+                <div x-show="activeSlide === index" 
+                     x-transition:enter="transition ease-in-out duration-1000"
+                     x-transition:enter-start="opacity-0 transform scale-105"
+                     x-transition:enter-end="opacity-100 transform scale-100"
+                     x-transition:leave="transition ease-in-out duration-1000"
+                     x-transition:leave-start="opacity-100 transform scale-100"
+                     x-transition:leave-end="opacity-0 transform scale-95"
+                     class="absolute inset-0">
+                    <img :src="slide.image" class="w-full h-full object-cover" :alt="t(slide.title_key)">
+                    <div class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center text-white p-4 text-center">
+                        <h2 class="text-3xl md:text-5xl font-bold mb-2" x-text="t(slide.title_key)"></h2>
+                        <p class="text-lg md:text-xl mb-4" x-text="t(slide.subtitle_key)"></p>
+                        <a href="#products" class="bg-[var(--brand-500)] hover:bg-[var(--brand-600)] text-white font-bold py-2 px-6 rounded-full transition duration-300" x-text="t('shop_now')"></a>
+                    </div>
+                </div>
+            </template>
+            <!-- Navigation -->
+            <button @click="prevSlide()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white/80 p-2 rounded-full text-gray-800 z-10">
+                <span class="material-symbols-outlined">arrow_back_ios_new</span>
+            </button>
+            <button @click="nextSlide()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white/80 p-2 rounded-full text-gray-800 z-10">
+                <span class="material-symbols-outlined">arrow_forward_ios</span>
+            </button>
+        </section>
+
+        <!-- Filters and Products -->
+        <section id="products">
+            <div class="flex flex-col md:flex-row gap-8">
+                <!-- Filters -->
+                <aside class="w-full md:w-1/4">
+                    <button @click="modals.isFilterOpen = true" class="md:hidden w-full flex items-center justify-center gap-2 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-md mb-4">
+                        <span class="material-symbols-outlined">filter_list</span>
+                        <span x-text="t('filters')"></span>
+                    </button>
+                    <div :class="{'block': modals.isFilterOpen, 'hidden md:block': !modals.isFilterOpen}" class="fixed md:relative inset-0 bg-gray-100 dark:bg-gray-900 z-50 md:z-auto p-4 md:p-0">
+                        <div class="flex justify-between items-center md:hidden mb-4">
+                            <h3 class="text-xl font-bold" x-text="t('filters')"></h3>
+                            <button @click="modals.isFilterOpen = false"><span class="material-symbols-outlined">close</span></button>
+                        </div>
+                        <div class="space-y-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                            <!-- Search -->
+                            <div>
+                                <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300" x-text="t('search')"></label>
+                                <input type="text" id="search" x-model.debounce.300ms="filters.search" :placeholder="t('search_placeholder')" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 shadow-sm focus:border-[var(--brand-500)] focus:ring focus:ring-[var(--brand-500)] focus:ring-opacity-50">
+                            </div>
+                            <!-- Category -->
+                            <div>
+                                <h4 class="font-semibold mb-2" x-text="t('category')"></h4>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="radio" x-model="filters.category" value="all" class="form-radio text-[var(--brand-500)] focus:ring-[var(--brand-500)]">
+                                        <span class="ml-2" x-text="t('all')"></span>
+                                    </label>
+                                    <template x-for="category in categories" :key="category">
+                                        <label class="flex items-center">
+                                            <input type="radio" x-model="filters.category" :value="category" class="form-radio text-[var(--brand-500)] focus:ring-[var(--brand-500)]">
+                                            <span class="ml-2 capitalize" x-text="t(category)"></span>
+                                        </label>
+                                    </template>
+                                </div>
+                            </div>
+                            <!-- Price Range -->
+                            <div>
+                                <label for="price" class="block font-medium text-gray-700 dark:text-gray-300"><span x-text="t('price')"></span>: <span x-text="formatCurrency(filters.maxPrice, true)"></span></label>
+                                <input type="range" id="price" x-model="filters.maxPrice" min="0" :max="priceRange.max" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-[var(--brand-500)]">
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+                
+                <!-- Product Grid -->
+                <div class="w-full md:w-3/4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <template x-for="product in filteredProducts" :key="product.id">
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 group">
+                                <a :href="`#product-${product.slug}`" @click.prevent="openProductModal(product)">
+                                    <div class="relative">
+                                        <img :src="product.image" :alt="t(product.name_key)" class="w-full h-56 object-cover">
+                                        <div class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full" x-text="`-${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%`"></div>
+                                    </div>
+                                    <div class="p-4">
+                                        <h3 class="font-semibold text-lg truncate" x-text="t(product.name_key)"></h3>
+                                        <div class="flex items-center my-2">
+                                            <template x-for="i in 5">
+                                                <span class="material-symbols-outlined text-sm" :class="i <= product.rating ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-500'" x-text="i <= product.rating ? 'star' : 'star_border'"></span>
+                                            </template>
+                                            <span class="text-xs text-gray-500 ml-2" x-text="`(${product.rating})`"></span>
+                                        </div>
+                                        <div class="flex items-baseline space-x-2">
+                                            <p class="text-xl font-bold text-[var(--brand-600)] dark:text-[var(--brand-400)]" x-text="formatCurrency(product.price)"></p>
+                                            <p class="text-sm text-gray-500 line-through" x-text="formatCurrency(product.originalPrice)"></p>
+                                        </div>
+                                    </div>
+                                </a>
+                                <div class="p-4 pt-0">
+                                    <button @click="addToCart(product)" class="w-full bg-[var(--brand-500)] hover:bg-[var(--brand-600)] text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition duration-300">
+                                        <span class="material-symbols-outlined">shopping_cart</span>
+                                        <span x-text="t('add_to_cart')"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-gray-800 mt-12 pt-12 pb-8">
+         <div class="container mx-auto px-4">
+            <!-- Footer content will also need translation, using x-text="t('key')" -->
+            <div class="text-center text-sm text-gray-500 mt-8">
+                © 2024 ShopCo. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modals and Slide-overs -->
+    
+    <!-- Cart Slide-over -->
+    <div x-show="modals.isCartOpen" @click.away="modals.isCartOpen = false" x-transition:enter="transition ease-in-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in-out duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-black/50 z-50">
+        <div @click.stop class="fixed inset-y-0 right-0 w-full max-w-md bg-white dark:bg-gray-800 shadow-xl z-50 flex flex-col" x-show="modals.isCartOpen" x-transition:enter="transition ease-in-out duration-300" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in-out duration-300" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full">
+            <div class="flex items-center justify-between p-4 border-b dark:border-gray-700">
+                <h2 class="text-xl font-bold" x-text="t('your_cart')"></h2>
+                <button @click="modals.isCartOpen = false"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="flex-grow overflow-y-auto p-4">
+                <template x-if="cart.length === 0">
+                    <p class="text-center text-gray-500" x-text="t('cart_empty')"></p>
+                </template>
+                <div class="space-y-4">
+                    <template x-for="item in cart" :key="item.id">
+                        <div class="flex items-center gap-4">
+                            <img :src="item.image" class="w-16 h-16 rounded-md object-cover">
+                            <div class="flex-grow">
+                                <h4 class="font-semibold" x-text="t(item.name_key)"></h4>
+                                <p class="text-sm text-gray-500" x-text="formatCurrency(item.price)"></p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button @click="updateQuantity(item.id, -1)" class="p-1 rounded-full bg-gray-200 dark:bg-gray-700">-</button>
+                                <span x-text="item.quantity"></span>
+                                <button @click="updateQuantity(item.id, 1)" class="p-1 rounded-full bg-gray-200 dark:bg-gray-700">+</button>
+                            </div>
+                            <button @click="removeFromCart(item.id)" class="text-red-500 hover:text-red-700"><span class="material-symbols-outlined">delete</span></button>
+                        </div>
+                    </template>
+                </div>
+            </div>
+            <div class="p-4 border-t dark:border-gray-700 space-y-4">
+                <div class="flex justify-between">
+                    <span x-text="t('subtotal')"></span>
+                    <span x-text="formatCurrency(cartSubtotal)"></span>
+                </div>
+                <div class="flex justify-between">
+                    <span>VAT (20%)</span>
+                    <span x-text="formatCurrency(cartVat)"></span>
+                </div>
+                <div class="flex justify-between font-bold text-lg">
+                    <span x-text="t('total')"></span>
+                    <span x-text="formatCurrency(cartTotal)"></span>
+                </div>
+                <button @click="modals.isCheckoutOpen = true; modals.isCartOpen = false; modals.activeModal = 'checkout'" class="w-full bg-[var(--brand-500)] hover:bg-[var(--brand-600)] text-white font-bold py-3 rounded-lg" :disabled="cart.length === 0">
+                    <span x-text="t('proceed_to_checkout')"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Generic Modal Wrapper -->
+    <template x-teleport="body">
+        <div x-show="modals.activeModal" @click.away="modals.activeModal = null; if (modals.activeModal === 'product') { window.location.hash = '#'; }"
+             x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            
+            <!-- Product Details Modal -->
+            <div x-show="modals.activeModal === 'product'" @click.stop
+                 x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                 class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col md:flex-row">
+                <template x-if="productToView">
+                    <div class="md:w-1/2">
+                        <img :src="productToView.image" class="w-full h-64 md:h-full object-cover rounded-t-lg md:rounded-l-lg md:rounded-t-none">
+                    </div>
+                </template>
+                <template x-if="productToView">
+                    <div class="p-6 flex-grow overflow-y-auto md:w-1/2">
+                        <h2 class="text-2xl font-bold mb-2" x-text="t(productToView.name_key)"></h2>
+                        <div class="flex items-center my-2">
+                             <template x-for="i in 5">
+                                 <span class="material-symbols-outlined" :class="i <= productToView.rating ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-500'" x-text="i <= productToView.rating ? 'star' : 'star_border'"></span>
+                             </template>
+                             <span class="text-sm text-gray-500 ml-2" x-text="`(${productToView.rating})`"></span>
+                         </div>
+                        <div class="flex items-baseline space-x-2 my-4">
+                            <p class="text-3xl font-bold text-[var(--brand-600)] dark:text-[var(--brand-400)]" x-text="formatCurrency(productToView.price)"></p>
+                            <p class="text-lg text-gray-500 line-through" x-text="formatCurrency(productToView.originalPrice)"></p>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400" x-text="t(productToView.description_key)"></p>
+                        <button @click="addToCart(productToView); modals.activeModal = null; window.location.hash = '#';" class="w-full mt-6 bg-[var(--brand-500)] hover:bg-[var(--brand-600)] text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2">
+                             <span class="material-symbols-outlined">add_shopping_cart</span>
+                             <span x-text="t('add_to_cart')"></span>
+                         </button>
+                    </div>
+                </template>
+            </div>
+            
+            <!-- Checkout Modal -->
+            <div x-show="modals.activeModal === 'checkout'" @click.stop
+                 x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                 class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
+                 <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-4" x-text="t('checkout')"></h2>
+                    <h3 class="font-semibold" x-text="t('payment_method')"></h3>
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                        <label class="flex flex-col items-center justify-center p-3 border rounded-lg cursor-pointer hover:border-[var(--brand-500)]" :class="{'border-[var(--brand-500)] bg-[var(--brand-50)] dark:bg-gray-700': checkout.paymentMethod === 'bank'}"><input type="radio" x-model="checkout.paymentMethod" value="bank" class="hidden"><span class="font-semibold" x-text="t('payment_bank')"></span></label>
+                        <label class="flex flex-col items-center justify-center p-3 border rounded-lg cursor-pointer hover:border-[var(--brand-500)]" :class="{'border-[var(--brand-500)] bg-[var(--brand-50)] dark:bg-gray-700': checkout.paymentMethod === 'stripe'}"><input type="radio" x-model="checkout.paymentMethod" value="stripe" class="hidden"><img src="https://js.stripe.com/v3/fingerprinted/img/stripe-logo-blurple-ade9341d3faf248f78082f509f6f32dd.svg" class="h-6"></label>
+                        <label class="flex flex-col items-center justify-center p-3 border rounded-lg cursor-pointer hover:border-[var(--brand-500)]" :class="{'border-[var(--brand-500)] bg-[var(--brand-50)] dark:bg-gray-700': checkout.paymentMethod === 'paypal'}"><input type="radio" x-model="checkout.paymentMethod" value="paypal" class="hidden"><img src="https://www.paypalobjects.com/images/shared/developer/logo/PP_Dev_Logo_Horizontal_02_1x.png" class="h-6"></label>
+                        <label class="flex flex-col items-center justify-center p-3 border rounded-lg cursor-pointer hover:border-[var(--brand-500)]" :class="{'border-[var(--brand-500)] bg-[var(--brand-50)] dark:bg-gray-700': checkout.paymentMethod === 'flutterwave'}"><input type="radio" x-model="checkout.paymentMethod" value="flutterwave" class="hidden"><img src="https://flutterwave.com/images/logo/full-logo-primary.svg" class="h-6"></label>
+                        <label class="flex flex-col items-center justify-center p-3 border rounded-lg cursor-pointer hover:border-[var(--brand-500)]" :class="{'border-[var(--brand-500)] bg-[var(--brand-50)] dark:bg-gray-700': checkout.paymentMethod === 'coinbase'}"><input type="radio" x-model="checkout.paymentMethod" value="coinbase" class="hidden"><img src="https://images.ctfassets.net/c5bd0wqjc7v0/3dF5vCWI21Y4g4n6o6a3iC/43e75a34ec72312d4493d484e5571618/coinbase-logo-black.svg" class="h-6"></label>
+                    </div>
+                    <div x-show="checkout.paymentMethod === 'bank'" class="mt-4 p-4 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 rounded-lg text-sm">
+                        <p><strong><span x-text="t('payment_bank')"></span>:</strong> Global Trust Bank</p>
+                        <p><strong><span x-text="t('account')"></span>:</strong> 1234567890</p>
+                        <p><strong><span x-text="t('name')"></span>:</strong> ShopCo Inc.</p>
+                    </div>
+                    <div class="mt-6 flex justify-end gap-4">
+                        <button @click="modals.activeModal = null" class="py-2 px-4 rounded-lg bg-gray-200 dark:bg-gray-700" x-text="t('cancel')"></button>
+                        <button @click="processPayment()" class="py-2 px-4 rounded-lg bg-[var(--brand-500)] text-white flex items-center justify-center min-w-[120px]">
+                            <span x-show="!checkout.processing" x-text="checkout.paymentMethod === 'bank' ? t('confirm_order') : `${t('pay')} ${formatCurrency(cartTotal)}`"></span>
+                            <span x-show="checkout.processing" class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
+                        </button>
+                    </div>
+                 </div>
+            </div>
+
+            <!-- Other modals (About, Policy) would go here -->
+            
+        </div>
+    </template>
+    
+    <!-- Toast Notification -->
+    <div x-show="toast.visible" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="transform opacity-0 translate-y-2"
+         x-transition:enter-end="transform opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-300"
+         x-transition:leave-start="transform opacity-100 translate-y-0"
+         x-transition:leave-end="transform opacity-0 translate-y-2"
+         class="fixed bottom-5 right-5 p-4 rounded-lg shadow-lg text-white z-50"
+         :class="toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'">
+        <p x-text="toast.message"></p>
+    </div>
+
+</div> <!-- End of main x-cloak wrapper -->
+    
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('app', () => ({
+        // App State
+        products: [],
+        categories: [],
+        priceRange: { min: 0, max: 100 },
+        cart: [],
+        filters: { search: '', category: 'all', maxPrice: 100 },
+        modals: { isCartOpen: false, isFilterOpen: false, activeModal: null },
+        productToView: null,
+        darkMode: false,
+        theme: 'emerald',
+        activeSlide: 0,
+        checkout: { paymentMethod: 'bank', processing: false },
+        toast: { visible: false, message: '', type: 'success' },
+        
+        // Internationalization & Config State
+        config: {},
+        i18n: {},
+        lang: 'en',
+        currency: 'USD',
+
+        heroSlides: [
+            { title_key: 'hero_title_1', subtitle_key: 'hero_subtitle_1', image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80' },
+            { title_key: 'hero_title_2', subtitle_key: 'hero_subtitle_2', image: 'https://images.unsplash.com/photo-1526738549149-8e072d544146?w=800&q=80' },
+            { title_key: 'hero_title_3', subtitle_key: 'hero_subtitle_3', image: 'https://images.unsplash.com/photo-1530982011887-381c8147a72b?w=800&q=80' }
+        ],
+        
+        // Getters
+        get filteredProducts() {
+            return this.products.filter(p => {
+                const searchMatch = this.t(p.name_key).toLowerCase().includes(this.filters.search.toLowerCase());
+                const categoryMatch = this.filters.category === 'all' || p.category === this.filters.category;
+                const priceMatch = p.price <= this.filters.maxPrice;
+                return searchMatch && categoryMatch && priceMatch;
+            });
+        },
+        get cartSubtotal() { return this.cart.reduce((total, item) => total + (item.price * item.quantity), 0); },
+        get cartVat() { return this.cartSubtotal * 0.20; },
+        get cartTotal() { return this.cartSubtotal + this.cartVat; },
+        
+        // Methods
+        async init() {
+            // Load config and set defaults
+            this.config = await (await fetch('./config.json')).json();
+            this.lang = localStorage.getItem('lang') || this.config.defaults.language;
+            this.currency = localStorage.getItem('currency') || this.config.defaults.currency;
+            
+            // Load language file
+            await this.loadLanguage();
+
+            // Load products
+            await this.fetchProducts();
+
+            // Load persisted state from localStorage
+            this.cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            this.darkMode = JSON.parse(localStorage.getItem('darkMode') || 'false');
+            this.theme = localStorage.getItem('theme') || 'emerald';
+
+            // Watchers to persist state
+            this.$watch('cart', (val) => localStorage.setItem('cart', JSON.stringify(val)));
+            this.$watch('darkMode', (val) => localStorage.setItem('darkMode', JSON.stringify(val)));
+            this.$watch('theme', (val) => localStorage.setItem('theme', val));
+            
+            // Init hero slider
+            setInterval(() => this.nextSlide(), 5000);
+            
+            // Handle product modal via URL hash
+            window.addEventListener('hashchange', () => this.handleHashChange());
+            this.handleHashChange();
+        },
+        
+        // i18n and Currency Methods
+        async loadLanguage() {
+            try {
+                const response = await fetch(`./locales/${this.lang}.json`);
+                if (!response.ok) throw new Error('Language file not found');
+                this.i18n = await response.json();
+            } catch (error) {
+                console.error(`Could not load language: ${this.lang}. Falling back to English.`, error);
+                if (this.lang !== 'en') {
+                    this.lang = 'en';
+                    await this.loadLanguage(); // Retry with English
+                }
+            }
+        },
+        t(key) {
+            return this.i18n[key] || key;
+        },
+        setLanguage(lang) {
+            this.lang = lang;
+            localStorage.setItem('lang', lang);
+            this.loadLanguage();
+        },
+        setCurrency(currency) {
+            this.currency = currency;
+            localStorage.setItem('currency', currency);
+        },
+        formatCurrency(value, isBase = false) {
+            const rate = isBase ? 1 : (this.config.exchangeRates[this.currency] || 1);
+            const price = value * rate;
+            try {
+                return new Intl.NumberFormat(this.lang, {
+                    style: 'currency',
+                    currency: this.currency
+                }).format(price);
+            } catch (e) {
+                // Fallback for invalid currency codes
+                return `${this.config.currencies[this.currency] || '$'}${price.toFixed(2)}`;
+            }
+        },
+        
+        // Product Logic
+        async fetchProducts() {
+            this.products = await (await fetch('./products.json')).json();
+            this.categories = [...new Set(this.products.map(p => p.category))];
+            const maxPrice = Math.ceil(Math.max(...this.products.map(p => p.originalPrice)));
+            this.priceRange.max = maxPrice;
+            this.filters.maxPrice = maxPrice;
+        },
+        
+        // Cart Logic
+        addToCart(product) {
+            const existingItem = this.cart.find(item => item.id === product.id);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                this.cart.push({ ...product, quantity: 1 });
+            }
+            this.showToast(this.t('toast_added_to_cart'), 'success');
+        },
+        removeFromCart(productId) { this.cart = this.cart.filter(item => item.id !== productId); },
+        updateQuantity(productId, change) {
+            const item = this.cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) this.removeFromCart(productId);
+            }
+        },
+
+        // Modal Logic
+        handleHashChange() {
+            const slug = window.location.hash.substring(9);
+            if (window.location.hash.startsWith('#product-') && slug) {
+                if(this.products.length > 0) {
+                    const product = this.products.find(p => p.slug === slug);
+                    if (product) this.openProductModal(product);
+                } else {
+                    setTimeout(() => this.handleHashChange(), 100);
+                }
+            } else if (this.modals.activeModal === 'product') {
+                this.modals.activeModal = null;
+            }
+        },
+        openProductModal(product) {
+            this.productToView = product;
+            this.modals.activeModal = 'product';
+            if(window.location.hash !== `#product-${product.slug}`) {
+                window.location.hash = `#product-${product.slug}`;
+            }
+        },
+        
+        // Hero Slider
+        nextSlide() { this.activeSlide = (this.activeSlide + 1) % this.heroSlides.length; },
+        prevSlide() { this.activeSlide = (this.activeSlide - 1 + this.heroSlides.length) % this.heroSlides.length; },
+        
+        // Checkout & Email Logic
+        async processPayment() {
+            this.checkout.processing = true;
+            await new Promise(res => setTimeout(res, 2000)); // Simulate API call
+
+            const success = Math.random() > 0.2; // 80% success rate
+            if (success) {
+                this.showToast(this.t('toast_payment_success'), 'success');
+                await this.sendOrderEmail();
+                this.cart = [];
+                this.modals.activeModal = null;
+            } else {
+                this.showToast(this.t('toast_payment_failed'), 'error');
+            }
+            this.checkout.processing = false;
+        },
+        async sendOrderEmail() {
+            try {
+                const template = await (await fetch('./email_template.html')).text();
+                const itemsHtml = this.cart.map(item => `
+                    <tr>
+                        <td style="padding: 5px;">${this.t(item.name_key)}</td>
+                        <td style="padding: 5px;">${item.quantity}</td>
+                        <td style="padding: 5px;">${this.formatCurrency(item.price * item.quantity)}</td>
+                    </tr>
+                `).join('');
+                
+                const replacements = {
+                    "{{ORDER_ID}}": `SCO-${Date.now()}`,
+                    "{{ORDER_DATE}}": new Date().toLocaleString(this.lang),
+                    "{{ITEMS_TABLE}}": itemsHtml,
+                    "{{SUBTOTAL}}": this.formatCurrency(this.cartSubtotal),
+                    "{{VAT}}": this.formatCurrency(this.cartVat),
+                    "{{TOTAL}}": this.formatCurrency(this.cartTotal),
+                    "{{PAYMENT_METHOD}}": this.checkout.paymentMethod.charAt(0).toUpperCase() + this.checkout.paymentMethod.slice(1)
+                };
+
+                let emailHtml = template;
+                for (const [key, value] of Object.entries(replacements)) {
+                    emailHtml = emailHtml.replace(new RegExp(key, 'g'), value);
+                }
+
+                console.log("--- SIMULATING SENDING ORDER EMAIL TO ADMIN ---");
+                console.log("To:", this.config.adminEmail);
+                console.log("Subject: New Order Confirmation");
+                console.log("--- EMAIL HTML ---");
+                console.log(emailHtml);
+                console.log("--- END OF SIMULATION ---");
+
+            } catch(e) {
+                console.error("Failed to generate order email:", e);
+            }
+        },
+
+        // Helpers
+        showToast(message, type = 'success') {
+            this.toast.message = message;
+            this.toast.type = type;
+            this.toast.visible = true;
+            setTimeout(() => { this.toast.visible = false; }, 3000);
+        },
+        toggleDarkMode() { this.darkMode = !this.darkMode; }
+    }));
+});
+</script>
+
+</body>
+</html>

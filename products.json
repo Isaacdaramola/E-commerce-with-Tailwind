@@ -1,0 +1,84 @@
+[
+  {
+    "id": 1,
+    "name_key": "product_jacket_name",
+    "slug": "vintage-leather-jacket",
+    "category": "fashion",
+    "price": 99.99,
+    "originalPrice": 199.99,
+    "rating": 5,
+    "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&q=80",
+    "description_key": "product_jacket_desc",
+    "reviews": [
+      { "name": "Alice", "rating": 5, "comment_key": "review_comment_1" },
+      { "name": "Bob", "rating": 4, "comment_key": "review_comment_2" }
+    ]
+  },
+  {
+    "id": 2,
+    "name_key": "product_headphones_name",
+    "slug": "wireless-headphones",
+    "category": "electronics",
+    "price": 149.50,
+    "originalPrice": 249.99,
+    "rating": 4,
+    "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80",
+    "description_key": "product_headphones_desc",
+    "reviews": [
+      { "name": "Charlie", "rating": 4, "comment_key": "review_comment_3" }
+    ]
+  },
+  {
+    "id": 3,
+    "name_key": "product_vase_name",
+    "slug": "modern-ceramic-vase",
+    "category": "home",
+    "price": 35.00,
+    "originalPrice": 50.00,
+    "rating": 5,
+    "image": "https://images.unsplash.com/photo-1578997982295-a22953287117?w=400&q=80",
+    "description_key": "product_vase_desc",
+    "reviews": []
+  },
+  {
+    "id": 4,
+    "name_key": "product_watch_name",
+    "slug": "classic-watch",
+    "category": "fashion",
+    "price": 250.00,
+    "originalPrice": 450.00,
+    "rating": 5,
+    "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80",
+    "description_key": "product_watch_desc",
+    "reviews": [
+      { "name": "Diana", "rating": 5, "comment_key": "review_comment_4" },
+      { "name": "Eve", "rating": 5, "comment_key": "review_comment_5" }
+    ]
+  },
+  {
+    "id": 5,
+    "name_key": "product_chair_name",
+    "slug": "ergonomic-chair",
+    "category": "home",
+    "price": 180.00,
+    "originalPrice": 300.00,
+    "rating": 4,
+    "image": "https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=400&q=80",
+    "description_key": "product_chair_desc",
+    "reviews": [
+      { "name": "Frank", "rating": 4, "comment_key": "review_comment_6" }
+    ]
+  },
+  {
+    "id": 6,
+    "name_key": "product_speaker_name",
+    "slug": "bluetooth-speaker",
+    "category": "electronics",
+    "price": 59.99,
+    "originalPrice": 89.99,
+    "rating": 4,
+    "image": "https://images.unsplash.com/photo-1589256469033-c8311b8893f4?w=400&q=80",
+    "description_key": "product_speaker_desc",
+    "reviews": []
+  }
+]

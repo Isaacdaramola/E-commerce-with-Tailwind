@@ -1,0 +1,5 @@
+{
+  "name": "Global E-Commerce Platform",
+  "description": "A single-page e-commerce website built with Alpine.js and TailwindCSS, featuring multi-language and multi-currency support.",
+  "requestFramePermissions": []
+}
