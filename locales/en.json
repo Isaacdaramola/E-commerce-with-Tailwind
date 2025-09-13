@@ -49,5 +49,12 @@
   "review_comment_3": "Sound is amazing, but the battery could be better.",
   "review_comment_4": "Looks even better in person. A true classic.",
   "review_comment_5": "Absolutely stunning watch. Worth every penny.",
-  "review_comment_6": "Very comfortable for long hours of work."
+  "review_comment_6": "Very comfortable for long hours of work.",
+  "share_product": "Share this Product",
+  "share_on_twitter": "Share on Twitter",
+  "share_on_facebook": "Share on Facebook",
+  "share_by_email": "Share by Email",
+  "share_twitter_text": "Check out this amazing product:",
+  "share_email_subject": "Check out this product",
+  "share_email_body": "I thought you might like this product I found:"
 }

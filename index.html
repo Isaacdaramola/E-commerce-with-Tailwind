@@ -313,6 +313,34 @@
                             <p class="text-lg text-gray-500 line-through" x-text="formatCurrency(productToView.originalPrice)"></p>
                         </div>
                         <p class="text-gray-600 dark:text-gray-400" x-text="t(productToView.description_key)"></p>
+                        
+                        <!-- Share Section -->
+                        <div class="mt-6">
+                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" x-text="t('share_product')"></h4>
+                            <div class="flex items-center space-x-3">
+                                <!-- Twitter -->
+                                <a :href="`https://twitter.com/intent/tweet?text=${encodeURIComponent(t('share_twitter_text') + ' ' + t(productToView.name_key))}&url=${encodeURIComponent(window.location.href)}`"
+                                   target="_blank" rel="noopener noreferrer"
+                                   class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                                   :aria-label="t('share_on_twitter')">
+                                    <svg class="w-5 h-5 text-gray-800 dark:text-gray-200" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                                </a>
+                                <!-- Facebook -->
+                                <a :href="`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`"
+                                   target="_blank" rel="noopener noreferrer"
+                                   class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                                   :aria-label="t('share_on_facebook')">
+                                    <svg class="w-5 h-5 text-gray-800 dark:text-gray-200" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd"/></svg>
+                                </a>
+                                <!-- Email -->
+                                <a :href="`mailto:?subject=${encodeURIComponent(t('share_email_subject') + ' ' + t(productToView.name_key))}&body=${encodeURIComponent(t('share_email_body') + ' ' + window.location.href)}`"
+                                   class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center justify-center"
+                                   :aria-label="t('share_by_email')">
+                                    <span class="material-symbols-outlined text-xl">mail</span>
+                                </a>
+                            </div>
+                        </div>
+
                         <button @click="addToCart(productToView); modals.activeModal = null; window.location.hash = '#';" class="w-full mt-6 bg-[var(--brand-500)] hover:bg-[var(--brand-600)] text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2">
                              <span class="material-symbols-outlined">add_shopping_cart</span>
                              <span x-text="t('add_to_cart')"></span>
@@ -394,215 +422,3 @@ document.addEventListener('alpine:init', () => {
         lang: 'en',
         currency: 'USD',
 
-        heroSlides: [
-            { title_key: 'hero_title_1', subtitle_key: 'hero_subtitle_1', image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80' },
-            { title_key: 'hero_title_2', subtitle_key: 'hero_subtitle_2', image: 'https://images.unsplash.com/photo-1526738549149-8e072d544146?w=800&q=80' },
-            { title_key: 'hero_title_3', subtitle_key: 'hero_subtitle_3', image: 'https://images.unsplash.com/photo-1530982011887-381c8147a72b?w=800&q=80' }
-        ],
-        
-        // Getters
-        get filteredProducts() {
-            return this.products.filter(p => {
-                const searchMatch = this.t(p.name_key).toLowerCase().includes(this.filters.search.toLowerCase());
-                const categoryMatch = this.filters.category === 'all' || p.category === this.filters.category;
-                const priceMatch = p.price <= this.filters.maxPrice;
-                return searchMatch && categoryMatch && priceMatch;
-            });
-        },
-        get cartSubtotal() { return this.cart.reduce((total, item) => total + (item.price * item.quantity), 0); },
-        get cartVat() { return this.cartSubtotal * 0.20; },
-        get cartTotal() { return this.cartSubtotal + this.cartVat; },
-        
-        // Methods
-        async init() {
-            // Load config and set defaults
-            this.config = await (await fetch('./config.json')).json();
-            this.lang = localStorage.getItem('lang') || this.config.defaults.language;
-            this.currency = localStorage.getItem('currency') || this.config.defaults.currency;
-            
-            // Load language file
-            await this.loadLanguage();
-
-            // Load products
-            await this.fetchProducts();
-
-            // Load persisted state from localStorage
-            this.cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            this.darkMode = JSON.parse(localStorage.getItem('darkMode') || 'false');
-            this.theme = localStorage.getItem('theme') || 'emerald';
-
-            // Watchers to persist state
-            this.$watch('cart', (val) => localStorage.setItem('cart', JSON.stringify(val)));
-            this.$watch('darkMode', (val) => localStorage.setItem('darkMode', JSON.stringify(val)));
-            this.$watch('theme', (val) => localStorage.setItem('theme', val));
-            
-            // Init hero slider
-            setInterval(() => this.nextSlide(), 5000);
-            
-            // Handle product modal via URL hash
-            window.addEventListener('hashchange', () => this.handleHashChange());
-            this.handleHashChange();
-        },
-        
-        // i18n and Currency Methods
-        async loadLanguage() {
-            try {
-                const response = await fetch(`./locales/${this.lang}.json`);
-                if (!response.ok) throw new Error('Language file not found');
-                this.i18n = await response.json();
-            } catch (error) {
-                console.error(`Could not load language: ${this.lang}. Falling back to English.`, error);
-                if (this.lang !== 'en') {
-                    this.lang = 'en';
-                    await this.loadLanguage(); // Retry with English
-                }
-            }
-        },
-        t(key) {
-            return this.i18n[key] || key;
-        },
-        setLanguage(lang) {
-            this.lang = lang;
-            localStorage.setItem('lang', lang);
-            this.loadLanguage();
-        },
-        setCurrency(currency) {
-            this.currency = currency;
-            localStorage.setItem('currency', currency);
-        },
-        formatCurrency(value, isBase = false) {
-            const rate = isBase ? 1 : (this.config.exchangeRates[this.currency] || 1);
-            const price = value * rate;
-            try {
-                return new Intl.NumberFormat(this.lang, {
-                    style: 'currency',
-                    currency: this.currency
-                }).format(price);
-            } catch (e) {
-                // Fallback for invalid currency codes
-                return `${this.config.currencies[this.currency] || '$'}${price.toFixed(2)}`;
-            }
-        },
-        
-        // Product Logic
-        async fetchProducts() {
-            this.products = await (await fetch('./products.json')).json();
-            this.categories = [...new Set(this.products.map(p => p.category))];
-            const maxPrice = Math.ceil(Math.max(...this.products.map(p => p.originalPrice)));
-            this.priceRange.max = maxPrice;
-            this.filters.maxPrice = maxPrice;
-        },
-        
-        // Cart Logic
-        addToCart(product) {
-            const existingItem = this.cart.find(item => item.id === product.id);
-            if (existingItem) {
-                existingItem.quantity++;
-            } else {
-                this.cart.push({ ...product, quantity: 1 });
-            }
-            this.showToast(this.t('toast_added_to_cart'), 'success');
-        },
-        removeFromCart(productId) { this.cart = this.cart.filter(item => item.id !== productId); },
-        updateQuantity(productId, change) {
-            const item = this.cart.find(item => item.id === productId);
-            if (item) {
-                item.quantity += change;
-                if (item.quantity <= 0) this.removeFromCart(productId);
-            }
-        },
-
-        // Modal Logic
-        handleHashChange() {
-            const slug = window.location.hash.substring(9);
-            if (window.location.hash.startsWith('#product-') && slug) {
-                if(this.products.length > 0) {
-                    const product = this.products.find(p => p.slug === slug);
-                    if (product) this.openProductModal(product);
-                } else {
-                    setTimeout(() => this.handleHashChange(), 100);
-                }
-            } else if (this.modals.activeModal === 'product') {
-                this.modals.activeModal = null;
-            }
-        },
-        openProductModal(product) {
-            this.productToView = product;
-            this.modals.activeModal = 'product';
-            if(window.location.hash !== `#product-${product.slug}`) {
-                window.location.hash = `#product-${product.slug}`;
-            }
-        },
-        
-        // Hero Slider
-        nextSlide() { this.activeSlide = (this.activeSlide + 1) % this.heroSlides.length; },
-        prevSlide() { this.activeSlide = (this.activeSlide - 1 + this.heroSlides.length) % this.heroSlides.length; },
-        
-        // Checkout & Email Logic
-        async processPayment() {
-            this.checkout.processing = true;
-            await new Promise(res => setTimeout(res, 2000)); // Simulate API call
-
-            const success = Math.random() > 0.2; // 80% success rate
-            if (success) {
-                this.showToast(this.t('toast_payment_success'), 'success');
-                await this.sendOrderEmail();
-                this.cart = [];
-                this.modals.activeModal = null;
-            } else {
-                this.showToast(this.t('toast_payment_failed'), 'error');
-            }
-            this.checkout.processing = false;
-        },
-        async sendOrderEmail() {
-            try {
-                const template = await (await fetch('./email_template.html')).text();
-                const itemsHtml = this.cart.map(item => `
-                    <tr>
-                        <td style="padding: 5px;">${this.t(item.name_key)}</td>
-                        <td style="padding: 5px;">${item.quantity}</td>
-                        <td style="padding: 5px;">${this.formatCurrency(item.price * item.quantity)}</td>
-                    </tr>
-                `).join('');
-                
-                const replacements = {
-                    "{{ORDER_ID}}": `SCO-${Date.now()}`,
-                    "{{ORDER_DATE}}": new Date().toLocaleString(this.lang),
-                    "{{ITEMS_TABLE}}": itemsHtml,
-                    "{{SUBTOTAL}}": this.formatCurrency(this.cartSubtotal),
-                    "{{VAT}}": this.formatCurrency(this.cartVat),
-                    "{{TOTAL}}": this.formatCurrency(this.cartTotal),
-                    "{{PAYMENT_METHOD}}": this.checkout.paymentMethod.charAt(0).toUpperCase() + this.checkout.paymentMethod.slice(1)
-                };
-
-                let emailHtml = template;
-                for (const [key, value] of Object.entries(replacements)) {
-                    emailHtml = emailHtml.replace(new RegExp(key, 'g'), value);
-                }
-
-                console.log("--- SIMULATING SENDING ORDER EMAIL TO ADMIN ---");
-                console.log("To:", this.config.adminEmail);
-                console.log("Subject: New Order Confirmation");
-                console.log("--- EMAIL HTML ---");
-                console.log(emailHtml);
-                console.log("--- END OF SIMULATION ---");
-
-            } catch(e) {
-                console.error("Failed to generate order email:", e);
-            }
-        },
-
-        // Helpers
-        showToast(message, type = 'success') {
-            this.toast.message = message;
-            this.toast.type = type;
-            this.toast.visible = true;
-            setTimeout(() => { this.toast.visible = false; }, 3000);
-        },
-        toggleDarkMode() { this.darkMode = !this.darkMode; }
-    }));
-});
-</script>
-
-</body>
-</html>

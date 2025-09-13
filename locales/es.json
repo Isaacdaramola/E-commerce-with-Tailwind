@@ -49,5 +49,12 @@
   "review_comment_3": "El sonido es increíble, pero la batería podría ser mejor.",
   "review_comment_4": "Se ve aún mejor en persona. Un verdadero clásico.",
   "review_comment_5": "Reloj absolutamente impresionante. Vale cada centavo.",
-  "review_comment_6": "Muy cómodo para largas horas de trabajo."
+  "review_comment_6": "Muy cómodo para largas horas de trabajo.",
+  "share_product": "Compartir este producto",
+  "share_on_twitter": "Compartir en Twitter",
+  "share_on_facebook": "Compartir en Facebook",
+  "share_by_email": "Compartir por correo electrónico",
+  "share_twitter_text": "Echa un vistazo a este increíble producto:",
+  "share_email_subject": "Mira este producto",
+  "share_email_body": "Pensé que te podría gustar este producto que encontré:"
 }
